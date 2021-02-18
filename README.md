@@ -19,29 +19,7 @@ in your react-native project, run `npm install react-native-webview-bridge --sav
 
 ### iOS
 
-1. go to xcode's `Project Navigator` tab
-<p align="center">
-    <img src ="https://raw.githubusercontent.com/alinz/react-native-webview-bridge/master/doc/assets/01.png" />
-</p>
-2. right click on `Libraries`
-3. select `Add Files to ...` option
-<p align="center">
-    <img src ="https://raw.githubusercontent.com/alinz/react-native-webview-bridge/master/doc/assets/02.png" />
-</p>
-4. navigate to `node_modules/react-native-webview-bridge/ios` and add `React-Native-Webview-Bridge.xcodeproj` folder
-<p align="center">
-    <img src ="https://raw.githubusercontent.com/alinz/react-native-webview-bridge/master/doc/assets/03.png" />
-</p>
-5. on project `Project Navigator` tab, click on your project's name and select Target's name and from there click on `Build Phases`
-<p align="center">
-    <img src ="https://raw.githubusercontent.com/alinz/react-native-webview-bridge/master/doc/assets/04.png" />
-</p>
-6. expand `Link Binary With Libraries` and click `+` sign to add a new one.
-7. select `libReact-Native-Webviwe-Bridge.a` and click `Add` button.
-<p align="center">
-    <img src ="https://raw.githubusercontent.com/alinz/react-native-webview-bridge/master/doc/assets/05.png" />
-</p>
-8. clean compile to make sure your project can compile and build.
+1. go to ios folder and pod install.
 
 ### Android
 
