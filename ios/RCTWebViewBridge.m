@@ -402,36 +402,36 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
  * Called when an error occurs while the web view is loading content.
  * @see https://fburl.com/km6vqenw
  */
-- (void)               webView:(WKWebView *)webView
-  didFailProvisionalNavigation:(WKNavigation *)navigation
-                     withError:(NSError *)error
-{
-  if (_onLoadingError) {
-    if ([error.domain isEqualToString:NSURLErrorDomain] && error.code == NSURLErrorCancelled) {
-      // NSURLErrorCancelled is reported when a page has a redirect OR if you load
-      // a new URL in the WebView before the previous one came back. We can just
-      // ignore these since they aren't real errors.
-      // http://stackoverflow.com/questions/1024748/how-do-i-fix-nsurlerrordomain-error-999-in-iphone-3-0-os
-      return;
-    }
+// - (void)               webView:(WKWebView *)webView
+//   didFailProvisionalNavigation:(WKNavigation *)navigation
+//                      withError:(NSError *)error
+// {
+//   if (_onLoadingError) {
+//     if ([error.domain isEqualToString:NSURLErrorDomain] && error.code == NSURLErrorCancelled) {
+//       // NSURLErrorCancelled is reported when a page has a redirect OR if you load
+//       // a new URL in the WebView before the previous one came back. We can just
+//       // ignore these since they aren't real errors.
+//       // http://stackoverflow.com/questions/1024748/how-do-i-fix-nsurlerrordomain-error-999-in-iphone-3-0-os
+//       return;
+//     }
 
-    if ([error.domain isEqualToString:@"WebKitErrorDomain"] && error.code == 102 || [error.domain isEqualToString:@"WebKitErrorDomain"] && error.code == 101) {
-      // Error code 102 "Frame load interrupted" is raised by the WKWebView
-      // when the URL is from an http redirect. This is a common pattern when
-      // implementing OAuth with a WebView.
-      return;
-    }
+//     if ([error.domain isEqualToString:@"WebKitErrorDomain"] && error.code == 102 || [error.domain isEqualToString:@"WebKitErrorDomain"] && error.code == 101) {
+//       // Error code 102 "Frame load interrupted" is raised by the WKWebView
+//       // when the URL is from an http redirect. This is a common pattern when
+//       // implementing OAuth with a WebView.
+//       return;
+//     }
 
-    NSMutableDictionary<NSString *, id> *event = [self baseEvent];
-    [event addEntriesFromDictionary:@{
-      @"didFailProvisionalNavigation": @YES,
-      @"domain": error.domain,
-      @"code": @(error.code),
-      @"description": error.localizedDescription,
-    }];
-    _onLoadingError(event);
-  }
-}
+//     NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+//     [event addEntriesFromDictionary:@{
+//       @"didFailProvisionalNavigation": @YES,
+//       @"domain": error.domain,
+//       @"code": @(error.code),
+//       @"description": error.localizedDescription,
+//     }];
+//     _onLoadingError(event);
+//   }
+// }
 
 - (void)evaluateJS:(NSString *)js
           thenCall: (void (^)(NSString*)) callback
