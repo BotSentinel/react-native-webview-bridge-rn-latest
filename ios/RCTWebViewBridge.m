@@ -292,8 +292,9 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 - (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
 {
   BOOL isJSNavigation = [navigationAction.request.URL.scheme isEqualToString:RCTJSNavigationScheme];
-
-  if (!isJSNavigation && [navigationAction.request.URL.scheme isEqualToString:RCTWebViewBridgeSchema]) {
+  BOOL isWebViewBridge = [navigationAction.request.URL.scheme isEqualToString:RCTWebViewBridgeSchema];
+    
+  if (isWebViewBridge) {
       __block NSString *message = nil;
       __block BOOL finished = NO;
       [webView evaluateJavaScript:@"WebViewBridge.__fetch__()" completionHandler:^(id result, NSError *error) {
@@ -317,8 +318,6 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
       }];
 
       _onBridgeMessage(onBridgeMessageEvent);
-
-      isJSNavigation = YES;
   }
 
   // skip this for the JS Navigation handler
@@ -348,6 +347,12 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
       _onLoadingStart(event);
     }
   }
+
+    if (isWebViewBridge) {
+        decisionHandler(WKNavigationActionPolicyCancel);
+        return;
+    }
+    
   // JS Navigation handler
   decisionHandler(WKNavigationActionPolicyAllow);
 }
