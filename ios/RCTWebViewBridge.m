@@ -294,6 +294,25 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
   BOOL isJSNavigation = [navigationAction.request.URL.scheme isEqualToString:RCTJSNavigationScheme];
   BOOL isWebViewBridge = [navigationAction.request.URL.scheme isEqualToString:RCTWebViewBridgeSchema];
     
+    // skip this for the JS Navigation handler
+    if (!isJSNavigation && _onShouldStartLoadWithRequest) {
+      NSMutableDictionary<NSString *, id> *event = [self baseEvent];
+      [event addEntriesFromDictionary: @{
+        @"url": (navigationAction.request.URL).absoluteString,
+        @"navigationType": @(navigationAction.navigationType)
+      }];
+      if (![self.delegate webView:self
+        shouldStartLoadForRequest:event
+                     withCallback:_onShouldStartLoadWithRequest]) {
+        decisionHandler(WKNavigationActionPolicyCancel);
+          return;
+      }
+    } else if (isWebViewBridge) {
+        decisionHandler(WKNavigationActionPolicyCancel);
+    } else {
+        decisionHandler(WKNavigationActionPolicyAllow);
+    }
+    
   if (isWebViewBridge) {
       __block NSString *message = nil;
       __block BOOL finished = NO;
@@ -320,21 +339,6 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
       _onBridgeMessage(onBridgeMessageEvent);
   }
 
-  // skip this for the JS Navigation handler
-  if (!isJSNavigation && _onShouldStartLoadWithRequest) {
-    NSMutableDictionary<NSString *, id> *event = [self baseEvent];
-    [event addEntriesFromDictionary: @{
-      @"url": (navigationAction.request.URL).absoluteString,
-      @"navigationType": @(navigationAction.navigationType)
-    }];
-    if (![self.delegate webView:self
-      shouldStartLoadForRequest:event
-                   withCallback:_onShouldStartLoadWithRequest]) {
-      decisionHandler(WKNavigationActionPolicyCancel);
-        return;
-    }
-  }
-
   if (_onLoadingStart) {
     // We have this check to filter out iframe requests and whatnot
     BOOL isTopFrame = [navigationAction.request.URL isEqual:navigationAction.request.mainDocumentURL];
@@ -347,14 +351,6 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
       _onLoadingStart(event);
     }
   }
-
-    if (isWebViewBridge) {
-        decisionHandler(WKNavigationActionPolicyCancel);
-        return;
-    }
-    
-  // JS Navigation handler
-  decisionHandler(WKNavigationActionPolicyAllow);
 }
 
 /**
